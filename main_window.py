@@ -17,9 +17,17 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.setWindowTitle('Calculadora')
 
-    def adjust_fixed_size(self):
+    def adjust_fixed_size(self) -> None:
         """
-        Method to adjust and fix the screen size.
+        Method to adjust and fix the window size.
         """
+
         self.adjustSize()
         self.setFixedSize(self.width(), self.height())
+
+    def add_widget_to_vlayout(self, widget: QWidget) -> None:
+        """
+        Add a widget to the v_layout.
+        """
+
+        self.v_layout.addWidget(widget)
