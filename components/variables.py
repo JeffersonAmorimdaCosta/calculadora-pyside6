@@ -4,9 +4,10 @@ This module has the most used variables.
 
 from pathlib import Path
 
-ROOT_FOLDER = Path(__file__).parent
+ROOT_FOLDER = Path(__file__).parent.parent
 SRC_PATH = ROOT_FOLDER / 'src'
 WINDOW_ICON_PATH = SRC_PATH / 'icon.png'
+print(ROOT_FOLDER)
 
 # Sizing
 BIG_FONT_SIZE = 40

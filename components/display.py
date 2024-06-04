@@ -4,7 +4,7 @@ Module for creating the 'Display' class
 
 from PySide6.QtWidgets import QLineEdit
 from PySide6.QtCore import Qt
-from variables import BIG_FONT_SIZE, TEXT_MARGIN, MINIMUM_WIDTH
+from .variables import BIG_FONT_SIZE, TEXT_MARGIN, MINIMUM_WIDTH
 
 
 class Display(QLineEdit):

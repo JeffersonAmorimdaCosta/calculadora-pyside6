@@ -4,8 +4,8 @@ Module for styling the app.
 
 import qdarktheme
 from PySide6.QtWidgets import QApplication
-from variables import (PRIMARY_COLOR, DARKER_PRIMARY_COLOR,
-                       DARKEST_PRIMARY_COLOR)
+from .variables import (PRIMARY_COLOR, DARKER_PRIMARY_COLOR,
+                        DARKEST_PRIMARY_COLOR)
 
 qss = f"""
     PushButton[cssClass="specialButton"] {{

@@ -1,3 +1,7 @@
+"""
+This module has the main window class.
+"""
+
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
 

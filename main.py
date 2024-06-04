@@ -5,11 +5,7 @@ Main module.
 import sys
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
-from main_window import MainWindow
-from display import Display
-from info import Info
-from style import setup_theme
-from variables import WINDOW_ICON_PATH
+from components import Display, Info, MainWindow, setup_theme, WINDOW_ICON_PATH
 
 if __name__ == '__main__':
     # Cria a aplicação
