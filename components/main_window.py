@@ -2,7 +2,7 @@
 This module has the main window class.
 """
 
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLayout
 
 
 class MainWindow(QMainWindow):
@@ -35,3 +35,10 @@ class MainWindow(QMainWindow):
         """
 
         self.v_layout.addWidget(widget)
+
+    def add_layout_to_vlayout(self, layout: QLayout) -> None:
+        """
+        Add a layout to the v_layout
+        """
+
+        self.v_layout.addLayout(layout)

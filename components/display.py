@@ -16,7 +16,7 @@ class Display(QLineEdit):
         super().__init__(*args, **kwargs)
         self.config_style()
 
-    def config_style(self):
+    def config_style(self) -> None:
         """
         Display settings.
         """

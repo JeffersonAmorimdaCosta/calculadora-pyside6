@@ -5,7 +5,8 @@ Main module.
 import sys
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
-from components import Display, Info, MainWindow, setup_theme, WINDOW_ICON_PATH
+from components import (Display, Info, MainWindow,
+                        ButtonsGrid, setup_theme, WINDOW_ICON_PATH)
 
 if __name__ == '__main__':
     # Cria a aplicação
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     window = MainWindow()
 
     # Estilizando
-    setup_theme(app, 'light')
+    setup_theme(app, 'dark')
 
     # Info
     info = Info('12 x 87')
@@ -22,6 +23,10 @@ if __name__ == '__main__':
     # Display
     display = Display()
     window.add_widget_to_vlayout(display)
+
+    # Grid
+    buttons_grid = ButtonsGrid()
+    window.add_layout_to_vlayout(buttons_grid)
 
     # Define o ícone
     icon = QIcon(str(WINDOW_ICON_PATH))
