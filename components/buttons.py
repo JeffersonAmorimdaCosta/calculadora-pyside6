@@ -3,8 +3,11 @@ This module has the class.
 """
 
 from PySide6.QtWidgets import QPushButton, QGridLayout
+from PySide6.QtCore import Slot
+from typing import Callable
 from .variables import MEDIUM_FONT_SIZE
 from .utils import is_num_or_dot
+from .display import Display
 
 
 class Button(QPushButton):
@@ -14,6 +17,7 @@ class Button(QPushButton):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
         self.config_style()
 
     def config_style(self) -> None:
@@ -31,7 +35,7 @@ class ButtonsGrid(QGridLayout):
     This class is responsible for the grid button settings.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, display: Display, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._grid_mask = [
@@ -42,6 +46,7 @@ class ButtonsGrid(QGridLayout):
             ['0', '', '.', '='],
         ]
 
+        self.display = display
         self._make_grid()
 
     def _make_grid(self) -> None:
@@ -59,3 +64,17 @@ class ButtonsGrid(QGridLayout):
                     self.addWidget(button, i, j, 1, 2)
                 else:
                     self.addWidget(button, i, j)
+                button.clicked.connect(self.__make_button_display_slot(
+                    self._insert_buttontext_to_display,
+                    button)
+                )
+
+    def __make_button_display_slot(self, func: Callable, *args, **kwargs):
+        @Slot()
+        def real_slot(_):
+            func(*args, **kwargs)
+        return real_slot
+
+    @Slot(Button)
+    def _insert_buttontext_to_display(self, button: Button):
+        self.display.insert(button.text())

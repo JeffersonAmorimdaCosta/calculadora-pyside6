@@ -25,7 +25,7 @@ if __name__ == '__main__':
     window.add_widget_to_vlayout(display)
 
     # Grid
-    buttons_grid = ButtonsGrid()
+    buttons_grid = ButtonsGrid(display)
     window.add_layout_to_vlayout(buttons_grid)
 
     # Define o ícone
