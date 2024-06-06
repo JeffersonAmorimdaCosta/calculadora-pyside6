@@ -17,7 +17,7 @@ if __name__ == '__main__':
     setup_theme(app, 'dark')
 
     # Info
-    info = Info('12 x 87')
+    info = Info('Sua conta')
     window.add_widget_to_vlayout(info)
 
     # Display
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     window.add_widget_to_vlayout(display)
 
     # Grid
-    buttons_grid = ButtonsGrid(display)
+    buttons_grid = ButtonsGrid(display, info)
     window.add_layout_to_vlayout(buttons_grid)
 
     # Define o ícone
