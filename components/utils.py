@@ -2,6 +2,7 @@ import re
 
 NUM_OR_DOT_REGEX = re.compile(r'^[0-9.]$')
 NUMERIC_EXPRESSION_REGEX = re.compile(r'^[0-9.+*/-]*$')
+CONTAIN_DIVISION_BY_ZERO_REGEX = re.compile(r'/\s*0+(\.0+)?\b')
 
 
 def is_num_or_dot(string: str) -> bool:
@@ -26,7 +27,15 @@ def is_valid_number(number: str) -> bool:
     return valid
 
 
-def is_numeric_expression(expression: str) -> bool:
+def contain_division_by_zero(expression: str) -> bool:
+    """
+    This fucntion checks whether the string contains any divisions by zero.
+    """
+
+    return bool(CONTAIN_DIVISION_BY_ZERO_REGEX.search(expression))
+
+
+def is_numeric_expression_or_void(expression: str) -> bool:
     """
     This function checks whether the string is a valid numeric expression.
     """

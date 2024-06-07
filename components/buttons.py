@@ -6,7 +6,8 @@ from typing import Callable, TYPE_CHECKING
 from PySide6.QtWidgets import QPushButton, QGridLayout
 from PySide6.QtCore import Slot
 from .variables import MEDIUM_FONT_SIZE, MINIMUN_HEIGHT_BUTTON
-from .utils import is_num_or_dot, is_valid_number, is_numeric_expression
+from .utils import (is_num_or_dot, is_valid_number,
+                    is_numeric_expression_or_void, contain_division_by_zero)
 
 if TYPE_CHECKING:
     from .display import Display
@@ -135,15 +136,20 @@ class ButtonsGrid(QGridLayout):
         self._left = self._right = self._initial_value
         self._op = None
         self.equation = self._equation_initial_value
+        self._eq_pressed = False
         self.display.clear()
 
     def _operator_clicked(self, button: Button):
+
+        if contain_division_by_zero(self.equation):
+            self._clear()
+            return
+        
         button_text = button.text()
         display_text = self.display.text()
-        print(is_numeric_expression(''))
         self.display.clear()
 
-        if not is_numeric_expression(display_text):
+        if not is_numeric_expression_or_void(display_text):
             return
 
         if display_text:
@@ -174,7 +180,7 @@ class ButtonsGrid(QGridLayout):
 
         elif not self._eq_pressed:
             self.equation += f' {str(self._right)}'
-            
+
         else:
             self.equation += f' {self._op} {str(self._right)}'
         self.info.setText(self.equation + ' =')
