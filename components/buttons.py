@@ -6,7 +6,7 @@ from typing import Callable, TYPE_CHECKING
 from PySide6.QtWidgets import QPushButton, QGridLayout
 from PySide6.QtCore import Slot
 from .variables import MEDIUM_FONT_SIZE, MINIMUN_HEIGHT_BUTTON
-from .utils import is_num_or_dot, is_valid_number
+from .utils import is_num_or_dot, is_valid_number, is_numeric_expression
 
 if TYPE_CHECKING:
     from .display import Display
@@ -58,6 +58,7 @@ class ButtonsGrid(QGridLayout):
         self._left: float | None = None
         self._right: float | None = None
         self._op: str | None = None
+        self._eq_pressed: bool = False
         self._make_grid()
 
     @property
@@ -139,16 +140,23 @@ class ButtonsGrid(QGridLayout):
         display_text = self.display.text()
         self.display.clear()
 
-        if not is_valid_number(display_text) and self._left is None:
+        if not is_numeric_expression(display_text) and self._left is None:
             return
 
-        if self._left is None:
+        if display_text:
             self._left = float(display_text)
-
         self._op = button_text
-        if self._left is not None:
-            self.equation += f'{self._left} {self._op}'
-        self.equation = f'{self._left} {self._op}'
+
+        if self.equation == self._equation_initial_value or self._eq_pressed:
+            self.equation = f' {self._left} {self._op}'
+
+        elif self.equation != self._equation_initial_value and display_text:
+            self.equation += f' {self._left} {self._op}'
+
+        else:
+            self.equation = self.equation[:-1] + self._op
+
+        self._eq_pressed = False
 
     def _eq(self):
         display_text = self.display.text()
@@ -157,11 +165,12 @@ class ButtonsGrid(QGridLayout):
             return
 
         self._right = float(display_text)
-        self.equation = f'{self._left} {self._op} {self._right} ='
+        self.equation += f' {str(self._right)}'
+        self.info.setText(self.equation + ' =')
 
         result = '0.0'
         try:
-            result = str(eval(self.equation.replace('=', '')))
+            result = str(eval(self.equation))
         except ZeroDivisionError:
             result = 'Division by zero'
 
@@ -172,3 +181,4 @@ class ButtonsGrid(QGridLayout):
 
         self._left = float(result)
         self._right = None
+        self._eq_pressed = True
