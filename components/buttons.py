@@ -55,8 +55,9 @@ class ButtonsGrid(QGridLayout):
         self.info = info
         self._equation = ''
         self._equation_initial_value = 'Sua conta'
-        self._left: float | None = None
-        self._right: float | None = None
+        self._initial_value = 0.0
+        self._left: float = self._initial_value
+        self._right: float = self._initial_value
         self._op: str | None = None
         self._eq_pressed: bool = False
         self._make_grid()
@@ -131,16 +132,18 @@ class ButtonsGrid(QGridLayout):
         self.display.insert(button.text())
 
     def _clear(self) -> None:
-        self._left = self._right = self._op = None
+        self._left = self._right = self._initial_value
+        self._op = None
         self.equation = self._equation_initial_value
         self.display.clear()
 
     def _operator_clicked(self, button: Button):
         button_text = button.text()
         display_text = self.display.text()
+        print(is_numeric_expression(''))
         self.display.clear()
 
-        if not is_numeric_expression(display_text) and self._left is None:
+        if not is_numeric_expression(display_text):
             return
 
         if display_text:
@@ -165,14 +168,22 @@ class ButtonsGrid(QGridLayout):
             return
 
         self._right = float(display_text)
-        self.equation += f' {str(self._right)}'
+
+        if not self._eq_pressed and self._op is None:
+            self.equation = display_text
+
+        elif not self._eq_pressed:
+            self.equation += f' {str(self._right)}'
+            
+        else:
+            self.equation += f' {self._op} {str(self._right)}'
         self.info.setText(self.equation + ' =')
 
         result = '0.0'
         try:
             result = str(eval(self.equation))
         except ZeroDivisionError:
-            result = 'Division by zero'
+            result = 'Divisão por zero'
 
         self.display.setText(result)
 
@@ -180,5 +191,5 @@ class ButtonsGrid(QGridLayout):
             result = '0.0'
 
         self._left = float(result)
-        self._right = None
+        self._right = self._initial_value
         self._eq_pressed = True
