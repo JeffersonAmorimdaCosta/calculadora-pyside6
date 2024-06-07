@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QPushButton, QGridLayout
 from PySide6.QtCore import Slot
 from .variables import MEDIUM_FONT_SIZE, MINIMUN_HEIGHT_BUTTON
 from .utils import (is_num_or_dot, is_valid_number,
-                    is_numeric_expression_or_void, contain_division_by_zero)
+                    is_numeric_expression_or_void)
 
 if TYPE_CHECKING:
     from .display import Display
@@ -87,6 +87,8 @@ class ButtonsGrid(QGridLayout):
                 if not is_num_or_dot(button_text):
                     button.setProperty('cssClass', 'specialButton')
                     self._setconfig_special_button(button)
+                else:
+                    button.setProperty('cssClass', 'genericButton')
 
                 if button_text == '0':
                     self.addWidget(button, i, j, 1, 2)
@@ -99,17 +101,21 @@ class ButtonsGrid(QGridLayout):
                 self._connect_button_clicked(button, slot)
 
     def _setconfig_special_button(self, button: Button):
+        text = button.text()
 
-        if button.text() == 'C':
+        if text == 'C':
             self._connect_button_clicked(button, self._clear)
 
-        if button.text() in '+-*/':
+        if text in '+-*/^':
             self._connect_button_clicked(button,
                                          self._make_slot(
                                              self._operator_clicked, button))
 
-        if button.text() == '=':
+        if text == '=':
             self._connect_button_clicked(button, self._eq)
+
+        if text == '◀':
+            self._connect_button_clicked(button, self.display.backspace)
 
     def _connect_button_clicked(self, button: Button, slot):
         """
@@ -117,6 +123,20 @@ class ButtonsGrid(QGridLayout):
         """
 
         button.clicked.connect(slot)
+
+    def enable_or_desable_buttons(self, on_off: bool) -> None:
+        """
+        Enable or desable the buttons except for the 'C' button.
+        """
+
+        count = self.count()
+
+        for index in range(count):
+            layout_item = self.itemAt(index)
+            button = layout_item.widget()
+
+            if isinstance(button, Button) and button.text() != 'C':
+                button.setEnabled(on_off)
 
     def _make_slot(self, func: Callable, *args, **kwargs):
         @Slot()
@@ -138,15 +158,13 @@ class ButtonsGrid(QGridLayout):
         self.equation = self._equation_initial_value
         self._eq_pressed = False
         self.display.clear()
+        self.enable_or_desable_buttons(True)
 
     def _operator_clicked(self, button: Button):
+        button_text = button.text()  # Operation
 
-        if contain_division_by_zero(self.equation):
-            self._clear()
-            return
-        
-        button_text = button.text()
         display_text = self.display.text()
+
         self.display.clear()
 
         if not is_numeric_expression_or_void(display_text):
@@ -175,7 +193,7 @@ class ButtonsGrid(QGridLayout):
 
         self._right = float(display_text)
 
-        if not self._eq_pressed and self._op is None:
+        if self._op is None:
             self.equation = display_text
 
         elif not self._eq_pressed:
@@ -187,14 +205,15 @@ class ButtonsGrid(QGridLayout):
 
         result = '0.0'
         try:
-            result = str(eval(self.equation))
+            # type: ignore
+            result = str(eval(self.equation.replace('^', '**')))
+            self.display.setText(result)
         except ZeroDivisionError:
-            result = 'Divisão por zero'
-
-        self.display.setText(result)
-
-        if not is_valid_number(result):
-            result = '0.0'
+            self.display.setText('Divisão por zero')
+            self.enable_or_desable_buttons(False)
+        except OverflowError:
+            self.display.setText('Estouro')
+            self.enable_or_desable_buttons(False)
 
         self._left = float(result)
         self._right = self._initial_value

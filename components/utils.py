@@ -1,3 +1,7 @@
+"""
+This module contains important functions for the code.
+"""
+
 import re
 
 NUM_OR_DOT_REGEX = re.compile(r'^[0-9.]$')
@@ -25,14 +29,6 @@ def is_valid_number(number: str) -> bool:
     except ValueError:
         ...
     return valid
-
-
-def contain_division_by_zero(expression: str) -> bool:
-    """
-    This fucntion checks whether the string contains any divisions by zero.
-    """
-
-    return bool(CONTAIN_DIVISION_BY_ZERO_REGEX.search(expression))
 
 
 def is_numeric_expression_or_void(expression: str) -> bool:

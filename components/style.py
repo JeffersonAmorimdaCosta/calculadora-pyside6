@@ -5,21 +5,30 @@ Module for styling the app.
 import qdarktheme  # type:ignore
 from PySide6.QtWidgets import QApplication
 from .variables import (PRIMARY_COLOR, DARKER_PRIMARY_COLOR,
-                        DARKEST_PRIMARY_COLOR)
+                        DARKEST_PRIMARY_COLOR, GRAY_COLOR,
+                        LIGHTER_PRIMARY_COLOR, WHITE_COLOR, LIGHT_GRAY_COLOR)
 
 qss = f"""
     QPushButton[cssClass="specialButton"] {{
-        color: #fff;
+        color: {WHITE_COLOR};
         background: {PRIMARY_COLOR};
         border-radius: 5px;
     }}
     QPushButton[cssClass="specialButton"]:hover {{
-        color: #fff;
+        color: {WHITE_COLOR};
         background: {DARKER_PRIMARY_COLOR};
     }}
     QPushButton[cssClass="specialButton"]:pressed {{
-        color: #fff;
+        color: {WHITE_COLOR};
         background: {DARKEST_PRIMARY_COLOR};
+    }}
+    QPushButton[cssClass="specialButton"]:disabled {{
+        color: {LIGHT_GRAY_COLOR};
+        background: {LIGHTER_PRIMARY_COLOR};
+    }}
+    QPushButton[cssClass="genericButton"]:disabled {{
+        color: {LIGHT_GRAY_COLOR};
+        background: {GRAY_COLOR};
     }}
 """
 
