@@ -40,3 +40,11 @@ def is_numeric_expression_or_void(expression: str) -> bool:
     if re.match(NUMERIC_EXPRESSION_REGEX, expression):
         is_expression = True
     return is_expression
+
+
+def is_empty(text: str) -> bool:
+    """
+    This function checks whether the string is empty.
+    """
+
+    return not bool(text)
