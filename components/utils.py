@@ -5,7 +5,6 @@ This module contains important functions for the code.
 import re
 
 NUM_OR_DOT_REGEX = re.compile(r'^[0-9.]$')
-NUMERIC_EXPRESSION_REGEX = re.compile(r'^[0-9.+*/-]*$')
 CONTAIN_DIVISION_BY_ZERO_REGEX = re.compile(r'/\s*0+(\.0+)?\b')
 
 
@@ -31,15 +30,22 @@ def is_valid_number(number: str) -> bool:
     return valid
 
 
-def is_numeric_expression_or_void(expression: str) -> bool:
+def is_number_or_empty(expression: str) -> bool:
     """
-    This function checks whether the string is a valid numeric expression.
+    This function checks whether the string is void or number.
     """
 
-    is_expression = False
-    if re.match(NUMERIC_EXPRESSION_REGEX, expression):
-        is_expression = True
-    return is_expression
+    is_num_void = False
+
+    if is_empty(expression):
+        is_num_void = True
+
+    try:
+        float(expression)
+        is_num_void = True
+    except ValueError:
+        ...
+    return is_num_void
 
 
 def is_empty(text: str) -> bool:

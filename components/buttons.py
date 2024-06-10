@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QPushButton, QGridLayout
 from PySide6.QtCore import Slot
 from .variables import MEDIUM_FONT_SIZE, MINIMUN_HEIGHT_BUTTON
 from .utils import (is_num_or_dot, is_valid_number,
-                    is_numeric_expression_or_void)
+                    is_number_or_empty)
 
 if TYPE_CHECKING:
     from .display import Display
@@ -45,7 +45,7 @@ class ButtonsGrid(QGridLayout):
         super().__init__(*args, **kwargs)
 
         self._grid_mask = [
-            ['C', '◀', '^', '/'],
+            ['C', '⌫', '^', '/'],
             ['7', '8', '9', '*'],
             ['4', '5', '6', '-'],
             ['1', '2', '3', '+'],
@@ -61,6 +61,7 @@ class ButtonsGrid(QGridLayout):
         self._right: float = self._initial_value
         self._op: str | None = None
         self._eq_pressed: bool = False
+        self._keyboard_blocked = False
         self._make_grid()
 
     @property
@@ -76,12 +77,21 @@ class ButtonsGrid(QGridLayout):
         self._equation = value
         self.info.setText(value)
 
+    def _connect_desconnect_signals(self, on_off: bool) -> None:
+        if on_off:
+            self.display.eq_pressed.connect(self._eq)
+            self.display.delete_pressed.connect(self._backspace)
+            self.display.input_pressed.connect(self._insert_to_display)
+            self.display.operator_pressed.connect(self._config_left_op)
+        else:
+            self.display.eq_pressed.disconnect(self._eq)
+            self.display.delete_pressed.disconnect(self._backspace)
+            self.display.input_pressed.disconnect(self._insert_to_display)
+            self.display.operator_pressed.disconnect(self._config_left_op)
+
     def _make_grid(self) -> None:
-        self.display.eq_pressed.connect(self._eq)
-        self.display.delete_pressed.connect(self.display.backspace)
+        self._connect_desconnect_signals(True)
         self.display.clear_pressed.connect(self._clear)
-        self.display.input_pressed.connect(self._insert_to_display)
-        self.display.operator_pressed.connect(self._config_left_op)
 
         for i, row in enumerate(self._grid_mask):
             for j, button_text in enumerate(row):
@@ -120,8 +130,8 @@ class ButtonsGrid(QGridLayout):
         if text == '=':
             self._connect_button_clicked(button, self._eq)
 
-        if text == '◀':
-            self._connect_button_clicked(button, self.display.backspace)
+        if text == '⌫':
+            self._connect_button_clicked(button, self._backspace)
 
     def _connect_button_clicked(self, button: Button, slot):
         """
@@ -158,6 +168,7 @@ class ButtonsGrid(QGridLayout):
         if not is_valid_number(new_value):
             return
         self.display.insert(text)
+        self.display.setFocus()
 
     @Slot()
     def _clear(self) -> None:
@@ -168,15 +179,28 @@ class ButtonsGrid(QGridLayout):
         self.display.clear()
         self.enable_or_desable_buttons(True)
 
+        if self._keyboard_blocked:
+            self._connect_desconnect_signals(True)
+            self._keyboard_blocked = False
+        self.display.setFocus()
+
     @Slot(str)
     def _config_left_op(self, text: str) -> None:
         button_text = text  # Operation
 
         display_text = self.display.text()
 
+        self.display.setFocus()
+
+        if button_text == '-':
+            if not display_text and \
+                    self.equation == self._equation_initial_value:
+                self.display.insert(button_text)
+                return
+
         self.display.clear()
 
-        if not is_numeric_expression_or_void(display_text):
+        if not is_number_or_empty(display_text):
             return
 
         if display_text:
@@ -221,10 +245,20 @@ class ButtonsGrid(QGridLayout):
         except ZeroDivisionError:
             self.display.setText('Divisão por zero')
             self.enable_or_desable_buttons(False)
+            self._connect_desconnect_signals(False)
+            self._keyboard_blocked = True
         except OverflowError:
             self.display.setText('Estouro')
             self.enable_or_desable_buttons(False)
+            self._connect_desconnect_signals(False)
+            self._keyboard_blocked = True
 
         self._left = float(result)
         self._right = self._initial_value
         self._eq_pressed = True
+        self.display.setFocus()
+
+    @Slot()
+    def _backspace(self) -> None:
+        self.display.backspace()
+        self.display.setFocus()
